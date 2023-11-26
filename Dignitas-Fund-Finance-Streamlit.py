@@ -13,6 +13,14 @@ import plotly.figure_factory as ff
 import plotly.io as pio
 from plotly.subplots import make_subplots
 
+# Use st.markdown to add a link to your custom CSS file
+st.markdown(
+    """
+    <link rel="stylesheet" type="text/css" href="style.css">
+    """,
+    unsafe_allow_html=True,
+)
+
 def data_prep():
     """ prep data before running the app"""
     df = etl.read_data()
@@ -54,30 +62,34 @@ show_metrics(donations_total, spending_total)
 
 def show_donations_spending(spending_total, donations_total):
     """ Show donations and spending by time period"""
-    col0, col1, col2 = st.columns(3)
+    col0, col1 = st.columns(2)
+    with col0:
+        timeperiod = st.selectbox(' ', ['Monthly  ',  'Weekly  ', 'Daily  '])
     with col1:
-        timeperiod = st.selectbox(' ', ['Monthly ', 'Weekly ', 'Daily ', 'Yearly '])
+        timespan = st.selectbox(' ',['Since launch', '1 Year ', '1 Month ', '3 Months ', '6 Months '])
 
     spending = da.sum_by_period(spending_total, timeperiod[0])
     donations = da.sum_by_period(donations_total, timeperiod[0])
 
-    if timeperiod == 'Monthly':
-        donations.index = donations.index.strftime("%Y-%m-%d")
-        spending.index = spending.index.strftime("%Y-%m-%d")
-        donations.index = pd.date_range(start=donations.index[0], periods=len(donations), freq='M')
-        spending.index = pd.date_range(start=spending.index[0], periods=len(spending), freq='M')
-
-    elif timeperiod == 'Yearly':
-        donations.index = donations.index.strftime("%Y")
-        spending.index = spending.index.strftime("%Y")
-    else:
-        donations.index = donations.index.strftime("%Y-%m-%d")
-        spending.index = spending.index.strftime("%Y-%m-%d")
-
+    if not isinstance(donations.index, pd.core.indexes.period.PeriodIndex):
+        donations.index = donations.index.to_period(timeperiod[0])
+    if not isinstance(spending.index, pd.core.indexes.period.PeriodIndex):
+        spending.index = spending.index.to_period(timeperiod[0])
 
     donations_and_spending = pd.merge(donations, spending, left_index=True, right_index=True, how = 'left')
     donations_and_spending.columns = ['Donations', 'Spending']
-    #donations_and_spending.index = donations_and_spending.index.start_time
+
+    if timespan == '1 Month ':
+        donations_and_spending = donations_and_spending.loc[donations_and_spending.index > (pd.Timestamp.now() - pd.DateOffset(months=1)).strftime("%Y-%m-%d")]
+    elif timespan == '3 Months ':
+        donations_and_spending = donations_and_spending.loc[donations_and_spending.index > (pd.Timestamp.now() - pd.DateOffset(months=3)).strftime("%Y-%m")]
+    elif timespan == '6 Months ':
+        donations_and_spending = donations_and_spending.loc[donations_and_spending.index > (pd.Timestamp.now() - pd.DateOffset(months=6)).strftime("%Y-%m")]
+    elif timespan == '1 Year ':
+        donations_and_spending = donations_and_spending.loc[donations_and_spending.index > (pd.Timestamp.now() - pd.DateOffset(years=1)).strftime("%Y")]
+
+    # Convert the Period index back to datetime index
+    donations_and_spending.index = donations_and_spending.index.to_timestamp()
 
     fig = charting_tools.bar_plot_grouped(donations_and_spending, 'Donations', 'Spending', '', False)
     st.plotly_chart(fig, use_container_width=True)
@@ -146,13 +158,16 @@ def donations_spending_by_period_by_category(donations_total_by_category, spendi
     main_donation_categories = donations_total_by_category.groupby('Category')['UAH'].sum().sort_values(ascending=False).index.tolist()
     #main_spending_categories = spending_total_by_category.groupby('Category')['UAH'].sum().sort_values(ascending = False).index[:4].tolist()
     main_spending_categories = spending_total_by_category.groupby('Category')['UAH'].sum().sort_values(ascending = False).index.tolist()
-    col0, col1, col2 = st.columns(3)
+
+    col0, col1, col2, col3 = st.columns(4)
     with col0:
-        amount = st.selectbox(' ',[' all ', '>100K', '<100K'])
+        amount = st.selectbox(' ',['<100K', '>100K', 'all txs'])
     with col1:
-        selected_period = st.selectbox(' ',['monthly', 'weekly', 'daily', 'yearly'])
+        selected_period = st.selectbox(' ',['Monthly ', 'Weekly ', 'Daily '])
     with col2:
-        donations_spending = st.selectbox(' ', ['donations', 'spending'])
+        donations_spending = st.selectbox(' ', ['Donations ', 'Spending '])
+    with col3:
+        timespan = st.selectbox(' ',[ 'All time', '1 Month', '3 Months', '1 Year'])
 
     if amount == '>100K':
         donations_by_category = large_donations_by_category
@@ -164,19 +179,38 @@ def donations_spending_by_period_by_category(donations_total_by_category, spendi
         donations_by_category = donations_total_by_category
         spending_by_category = spending_total_by_category
 
-    if donations_spending == 'donations':
+    if donations_spending == 'Donations ':
         main_categories = main_donation_categories
         tx_by_category = donations_by_category
     else:
         main_categories = main_spending_categories
         tx_by_category = spending_by_category
 
+    if timespan == '1 Month':
+        tx_by_category = tx_by_category[tx_by_category['Date'] >= pd.Timestamp.now().floor('D') - pd.DateOffset(months=1)]
+    elif timespan == '3 Month':
+        tx_by_category = tx_by_category[tx_by_category['Date'] >= pd.Timestamp.now().floor('D') - pd.DateOffset(months=3)]
+    elif timespan == '1 Year':
+        tx_by_category = tx_by_category[tx_by_category['Date'] >= pd.Timestamp.now().floor('D') - pd.DateOffset(years=1)]
+
     fig = charting_tools.chart_by_period(tx_by_category, main_categories, selected_period[0],
-                                        f'{selected_period} {amount} {donations_spending}')
+                                        f'{selected_period} {amount} {donations_spending} over {timespan}')
     st.plotly_chart(fig, use_container_width=True)
 
 donations_spending_by_period_by_category(donations_total_by_category, spending_total_by_category,
                                                                         large_donations_by_category, large_spending_by_category,
                                                                         donations_below_large_by_category, spending_below_large_by_category)
 
-st.markdown("Visit [Dignitas Fund](https://dignitas.fund/)")
+st.markdown("<br>", unsafe_allow_html=True)
+# Donate button
+import webbrowser
+url_to_open = "https://www.dignitas.fund/uk/donate"
+col1, col2, col3 = st.columns(3)
+if col2.button("Donate", key="donate_button", help="Click to donate"):
+    webbrowser.open_new_tab(url_to_open)
+
+# Links
+st.write("---")
+col1, col2, col3, col4 = st.columns(4)
+with col1: st.markdown("[Dignitas Fund Site](https://dignitas.fund/uk)")
+with col4: st.markdown(f"[{'Contact'}](mailto:{'info@dignitas.fund'})")

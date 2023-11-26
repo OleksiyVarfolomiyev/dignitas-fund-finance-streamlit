@@ -1,0 +1,12 @@
+/* Define dark background color for the body */
+body {
+    background-color: #121212; /* Dark background color */
+    color: white; /* Text color */
+}
+
+/* Customize specific elements if needed */
+/* For example, set a dark background color for a Streamlit button */
+.stButton>button {
+    background-color: #4CAF50; /* Green button color */
+    color: white;
+}
