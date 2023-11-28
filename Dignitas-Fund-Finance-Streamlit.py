@@ -65,7 +65,7 @@ show_metrics(donations_total, spending_total)
 def show_donations_spending(spending_total, donations_total):
     """ Show donations and spending by time period"""
 
-    col0, col1 = st.columns(2)
+    col0, col1, col2, col3 = st.columns(4)
     with col0:
         timeperiod = st.selectbox(' ', ['Monthly  ',  'Weekly  ', 'Daily  '])
 
@@ -77,7 +77,7 @@ def show_donations_spending(spending_total, donations_total):
     elif timeperiod == 'Weekly  ':
         st.session_state.timespan = '3 Months '
 
-    with col1:
+    with col3:
         timespan = st.selectbox(' ',['Since launch ', '1 Year ', '1 Month ', '3 Months ', '6 Months '],
                                 index=['Since launch ', '1 Year ', '1 Month ', '3 Months ', '6 Months '].index(st.session_state.timespan))
 
@@ -117,9 +117,9 @@ def show_donations_spending_by_category(large_donations_by_category, large_spend
     spending_by_category = spending_total_by_category
 
     col0, col1, col2, col3 = st.columns(4)
-    with col1:
+    with col0:
         over_below_all = st.selectbox(' ',['all txs', 'over 100K', 'below 100K'])
-    with col2:
+    with col3:
         period = st.selectbox(' ', ['Month', 'Week', 'Day', 'Year'])
 
     if period == 'Month':
