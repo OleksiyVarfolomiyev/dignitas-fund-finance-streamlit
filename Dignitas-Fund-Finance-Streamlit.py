@@ -62,11 +62,22 @@ show_metrics(donations_total, spending_total)
 
 def show_donations_spending(spending_total, donations_total):
     """ Show donations and spending by time period"""
+
     col0, col1 = st.columns(2)
     with col0:
         timeperiod = st.selectbox(' ', ['Monthly  ',  'Weekly  ', 'Daily  '])
+
+    if 'timespan' not in st.session_state:
+        st.session_state.timespan = 'Since launch '
+
+    if timeperiod == 'Daily  ':
+        st.session_state.timespan = '1 Month '
+    elif timeperiod == 'Weekly  ':
+        st.session_state.timespan = '3 Months '
+
     with col1:
-        timespan = st.selectbox(' ',['Since launch', '1 Year ', '1 Month ', '3 Months ', '6 Months '])
+        timespan = st.selectbox(' ',['Since launch ', '1 Year ', '1 Month ', '3 Months ', '6 Months '],
+                                index=['Since launch ', '1 Year ', '1 Month ', '3 Months ', '6 Months '].index(st.session_state.timespan))
 
     spending = da.sum_by_period(spending_total, timeperiod[0])
     donations = da.sum_by_period(donations_total, timeperiod[0])
@@ -88,7 +99,6 @@ def show_donations_spending(spending_total, donations_total):
     elif timespan == '1 Year ':
         donations_and_spending = donations_and_spending.loc[donations_and_spending.index > (pd.Timestamp.now() - pd.DateOffset(years=1)).strftime("%Y")]
 
-    # Convert the Period index back to datetime index
     donations_and_spending.index = donations_and_spending.index.to_timestamp()
 
     fig = charting_tools.bar_plot_grouped(donations_and_spending, 'Donations', 'Spending', '', False)
