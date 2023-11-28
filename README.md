@@ -1,2 +1,2 @@
 # Dignitas Fund Financials
-[Visit](https://dignitas-fund-finance.streamlit.app/)
+[Visit](https://dignitas-ukraine.streamlit.app/)
