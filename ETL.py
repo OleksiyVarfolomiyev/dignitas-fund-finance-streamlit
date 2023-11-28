@@ -132,6 +132,9 @@ def extract_relevant_txs(df, start_date, end_date):
     ds['Category'] = ds['Category'].str.replace('Дрони Люті пташки', 'Люті пташки')
     ds['Category'] = ds['Category'].str.replace('Адміністративні витрати', 'Адмін')
     df['Category'] = df['Category'].str.replace('Грант МЛПК', 'МЛПК')
+    # ds['Category'] = ds['Category'].str.replace('Канцелярія', 'Адмін')
+    # ds['Category'] = ds['Category'].str.replace('Комісія банку', 'Адмін')
+    # ds['Category'] = ds['Category'].str.replace('обладнання', 'Обладнання')
 
     mask = ds['From Account'] == 'Приват Банк Адмін рахунок'
     ds.loc[mask, 'Category'] = 'Адмін'
@@ -156,6 +159,12 @@ def extract_relevant_txs(df, start_date, end_date):
     df.loc[mask, 'Category'] = 'МЛПК'
     mask = df['Commentary'].str.contains('From UK ONLINE GIVING FOUNDATION', case=False, na=False)
     df.loc[mask, 'Category'] = 'Загальні донати'
+    mask = ds['Category'].str.contains('Канцелярія', case=False, na=False)
+    ds.loc[mask, 'Category'] = 'Адмін'
+    mask = ds['Category'].str.contains('обладнання', case=False, na=False)
+    ds.loc[mask, 'Category'] = 'Обладнання'
+    mask = ds['Category'].str.contains('Комісія банку', case=False, na=False)
+    ds.loc[mask, 'Category'] = 'Адмін'
 
     # save preppped data to csv
     #df.to_csv('data/donations.csv', index=False)

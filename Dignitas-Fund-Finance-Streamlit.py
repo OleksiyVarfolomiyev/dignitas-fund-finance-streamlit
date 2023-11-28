@@ -13,7 +13,8 @@ import plotly.figure_factory as ff
 import plotly.io as pio
 from plotly.subplots import make_subplots
 
-# Use st.markdown to add a link to your custom CSS file
+
+# make background Dark
 st.markdown(
     """
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -60,6 +61,7 @@ def show_metrics(donations_total, spending_total):
 
 show_metrics(donations_total, spending_total)
 
+
 def show_donations_spending(spending_total, donations_total):
     """ Show donations and spending by time period"""
 
@@ -68,7 +70,7 @@ def show_donations_spending(spending_total, donations_total):
         timeperiod = st.selectbox(' ', ['Monthly  ',  'Weekly  ', 'Daily  '])
 
     if 'timespan' not in st.session_state:
-        st.session_state.timespan = 'Since launch '
+            st.session_state.timespan = 'Since launch '
 
     if timeperiod == 'Daily  ':
         st.session_state.timespan = '1 Month '
