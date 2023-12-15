@@ -38,7 +38,7 @@ def data_prep():
 
 # app code
 large_donations_by_category, large_spending_by_category, donations_below_large_by_category, spending_below_large_by_category, \
-           donations_total, spending_total, donations_total_by_category, spending_total_by_category = etl.read_txs()
+        donations_total, spending_total, donations_total_by_category, spending_total_by_category = etl.read_txs()
 
 st.title("Dignitas Fund **Financials**")
 
