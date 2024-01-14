@@ -29,7 +29,7 @@ def read_txs():
     spending_total_by_category = pd.read_csv('data/spending_total_by_category.csv', dtype=dtypes, parse_dates=['Date'])
 
     return large_donations_by_category, large_spending_by_category, donations_below_large_by_category, spending_below_large_by_category, \
-           donations_total, spending_total, donations_total_by_category, spending_total_by_category
+        donations_total, spending_total, donations_total_by_category, spending_total_by_category
 
 
 def read_data(nrows = None):
