@@ -132,6 +132,7 @@ def extract_relevant_txs(df, start_date, end_date):
     ds['Category'] = ds['Category'].str.replace('Дрони Люті пташки', 'Люті пташки')
     ds['Category'] = ds['Category'].str.replace('Адміністративні витрати', 'Адмін')
     df['Category'] = df['Category'].str.replace('Грант МЛПК', 'МЛПК')
+    #df['Category'] = df['Category'].str.replace('бухгалтерські послуги (аудит)', 'Адмін')
     # ds['Category'] = ds['Category'].str.replace('Канцелярія', 'Адмін')
     # ds['Category'] = ds['Category'].str.replace('Комісія банку', 'Адмін')
     # ds['Category'] = ds['Category'].str.replace('обладнання', 'Обладнання')
@@ -164,6 +165,8 @@ def extract_relevant_txs(df, start_date, end_date):
     mask = ds['Category'].str.contains('обладнання', case=False, na=False)
     ds.loc[mask, 'Category'] = 'Обладнання'
     mask = ds['Category'].str.contains('Комісія банку', case=False, na=False)
+    ds.loc[mask, 'Category'] = 'Адмін'
+    mask = ds['Category'].str.contains('бухгалтерські послуги', case=False, na=False)
     ds.loc[mask, 'Category'] = 'Адмін'
 
     # save preppped data to csv
