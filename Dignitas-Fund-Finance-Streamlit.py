@@ -12,7 +12,7 @@ from plotly.offline import iplot
 import plotly.figure_factory as ff
 import plotly.io as pio
 from plotly.subplots import make_subplots
-
+import toml
 
 # make background Dark
 st.markdown(

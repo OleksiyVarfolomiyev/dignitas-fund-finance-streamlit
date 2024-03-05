@@ -84,6 +84,7 @@ def extract_relevant_txs(df, start_date, end_date):
     #df = df[df['Category'] != 'Transfer']
     #ds = ds[ds['Category'] != 'Transfer']
     ds = ds[ds['Category'] != 'Продаж валюти']
+    ds = ds[ds['Category'] != 'Продаж']
 
     ds = replace_category(ds, 'Category', 'Закупівлі')
     df = replace_category(df, 'Category', 'Донати')
