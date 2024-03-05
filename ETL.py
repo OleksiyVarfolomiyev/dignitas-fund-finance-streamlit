@@ -80,11 +80,14 @@ def extract_relevant_txs(df, start_date, end_date):
     df = df[~df['Commentary'].str.contains('Переказ між рахунками організації')]
     ds = ds[~ds['Commentary'].str.contains('Переказ між рахунками організації')]
     df = df[~df['Commentary'].str.contains('Гривнi вiд продажу')]
-    ds = ds[~ds['Commentary'].str.contains('Списання коштiв на здiйснення валютно-обмiнних операцiй')]
+    #ds = ds[~ds['Commentary'].str.contains('Списання коштiв на здiйснення валютно-обмiнних операцiй')]
     #df = df[df['Category'] != 'Transfer']
     #ds = ds[ds['Category'] != 'Transfer']
-    ds = ds[ds['Category'] != 'Продаж валюти']
-    ds = ds[ds['Category'] != 'Продаж']
+    #ds = ds[ds['Category'] != 'Продаж валюти']
+    #ds = ds[ds['Category'] != 'Продаж']
+    ds = ds.drop_duplicates()
+    ds = ds[~ds['Commentary'].str.contains('продаж', case=False).fillna(False)]
+    ds = ds[~ds['Commentary'].str.contains('списання', case=False).fillna(False)]
 
     ds = replace_category(ds, 'Category', 'Закупівлі')
     df = replace_category(df, 'Category', 'Донати')
