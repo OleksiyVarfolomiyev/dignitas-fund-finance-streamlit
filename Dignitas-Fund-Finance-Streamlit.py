@@ -34,8 +34,7 @@ def data_prep():
     #end_date = dt.date.today() - dt.timedelta(days=1)
     etl.extract_relevant_txs(df, start_date, end_date)
 
-# Run once to ETL the data then comment out and run the app
-# data are aggregated for anonymization and speed
+# ! Run once to ETL the data then comment out and run the app
 
 #data_prep()
 
