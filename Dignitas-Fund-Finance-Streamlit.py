@@ -36,7 +36,7 @@ def data_prep():
 
 # ! Run once to ETL the data then comment out and run the app
 
-#data_prep()
+data_prep()
 
 # app code
 large_donations_by_category, large_spending_by_category, donations_below_large_by_category, spending_below_large_by_category, \
